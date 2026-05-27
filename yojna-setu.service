@@ -1,0 +1,13 @@
+[Unit]
+Description=Yojna Setu Spring Boot App
+After=network.target mysql.service
+
+[Service]
+Type=forking
+User=ubuntu
+ExecStart=/home/ubuntu/start-app.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
