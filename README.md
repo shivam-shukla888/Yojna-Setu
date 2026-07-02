@@ -2,25 +2,25 @@
 
 > Helping Indian citizens discover government schemes they are eligible for — in Hindi, on WhatsApp.
 
-## 🚀 Live Demo
+##  Live Demo
 Send "namaste" to **+1 415 523 8886** on WhatsApp to try it!
 (Join sandbox first: send "join length-future" to the same number)
 
-## 💡 Problem Statement
+##  Problem Statement
 Over 90 crore Indians are eligible for government schemes but never apply — due to lack of awareness, language barriers, and complex processes. Yojna Setu solves this through a simple WhatsApp conversation in Hindi.
 
-## ✨ Features
-- 🗣️ **Hindi/Hinglish NLP** — Powered by Groq API (Llama 3)
-- 🎤 **Voice Message Support** — Groq Whisper transcription
-- 📋 **82+ Schemes** — Central + State + Private scholarships
-- 🎯 **Smart Eligibility Matching** — Age, income, caste, state, religion, occupation
-- 📄 **Document Checklist** — Exact documents needed per scheme
-- ⏰ **Deadline Reminders** — Never miss application deadlines
-- 🔍 **Scheme Search** — Search any scheme by name
-- 🔄 **Pagination** — Browse all matched schemes
-- ♻️ **Reset & Help** — Full conversation control
+##  Features
+-  **Hindi/Hinglish NLP** — Powered by Groq API (Llama 3)
+-  **Voice Message Support** — Groq Whisper transcription
+-  **82+ Schemes** — Central + State + Private scholarships
+-  **Smart Eligibility Matching** — Age, income, caste, state, religion, occupation
+-  **Document Checklist** — Exact documents needed per scheme
+-  **Deadline Reminders** — Never miss application deadlines
+-  **Scheme Search** — Search any scheme by name
+-  **Pagination** — Browse all matched schemes
+-  **Reset & Help** — Full conversation control
 
-## 🛠️ Tech Stack
+## Tech Stack
 | Layer | Technology |
 |-------|-----------|
 | Backend | Java 21, Spring Boot 3.2 |
@@ -29,7 +29,7 @@ Over 90 crore Indians are eligible for government schemes but never apply — du
 | Messaging | Twilio WhatsApp API |
 | Deployment | AWS EC2 t2.micro, systemd |
 
-## 🏗️ Architecture
+## Architecture
 User (WhatsApp) → Twilio Webhook → Spring Boot REST API
 ↓
 Groq AI (NLP)
@@ -49,7 +49,7 @@ Twilio Reply → User
 | `help` | Show all commands |
 | `[scheme name]` | Search scheme details |
 
-## ⚙️ Local Setup
+##  Local Setup
 1. Clone the repo
 ```bash
 git clone https://github.com/shivam-shukla888/Yojna-Setu.git
@@ -69,11 +69,11 @@ spring.datasource.password=YOUR_PASSWORD
 ```
 4. Set Twilio webhook: `http://YOUR_IP:8080/webhook/whatsapp`
 
-## 📊 Scheme Categories
+## Scheme Categories
 - Central Government (PM-KISAN, Ayushman Bharat, PM Awas, etc.)
 - State Specific (UP, Bihar, Maharashtra, Rajasthan, MP, WB, Delhi)
 - Education & Scholarships (Govt + Private: Tata, Reliance, HDFC, Infosys)
 - Women Empowerment, Disability, Minorities, Skill Development
 
-## 👨💻 Author
+## Author
 **Shivam Shukla** — [GitHub](https://github.com/shivam-shukla888)
