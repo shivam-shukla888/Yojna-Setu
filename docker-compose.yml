@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yojna-setu-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - APP_ENV=production
+      - SERVER_PORT=8080
+      - DB_URL=jdbc:postgresql://db:5432/postgres?currentSchema=yojna_setu
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres_dev_password
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - GROQ_MODEL=${GROQ_MODEL:-llama-3.1-8b-instant}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - TWILIO_WHATSAPP_FROM=${TWILIO_WHATSAPP_FROM:-}
+      - SECURITY_INTERNAL_API_SECRET=${SECURITY_INTERNAL_API_SECRET:-prod-secret-key-change-me-32-chars-long}
+      - SECURITY_PHONE_HASH_PEPPER=${SECURITY_PHONE_HASH_PEPPER:-production-pepper-32-chars-minimum-salt}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - yojna-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: yojna-setu-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yojna-network
+
+networks:
+  yojna-network:
+    driver: bridge
+
+volumes:
+  pgdata:

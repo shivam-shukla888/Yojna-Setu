@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yojna Setu V2 — Live Interactive Portfolio & Assistant Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #111827;
+            --bg-surface-elevated: #1f2937;
+            --border-color: #374151;
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --primary-glow: rgba(16, 185, 129, 0.25);
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --chat-bubble-in: #1f2937;
+            --chat-bubble-out: #065f46;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(90deg, #111827 0%, #1e1b4b 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-badge {
+            background: var(--primary);
+            color: #064e3b;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            letter-spacing: 0.05em;
+        }
+
+        .brand h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #ffffff, #a7f3d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            flex: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Chat Window */
+        .chat-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: calc(100vh - 120px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        .chat-header {
+            padding: 1rem;
+            background-color: #0f172a;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #047857);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.03) 0%, transparent 70%);
+        }
+
+        .message-bubble {
+            max-width: 82%;
+            padding: 0.85rem 1.1rem;
+            border-radius: 1rem;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .bubble-bot {
+            align-self: flex-start;
+            background-color: var(--chat-bubble-in);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .bubble-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: #ffffff;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .bubble-meta {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.35rem;
+            text-align: right;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            background-color: #0f172a;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .btn-send {
+            background-color: var(--primary);
+            color: #064e3b;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0 1.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-send:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Inspector Panel */
+        .inspector-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .state-badge {
+            background-color: #1e1b4b;
+            color: #c7d2fe;
+            border: 1px solid #4338ca;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-pill {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.4rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-pill:hover {
+            border-color: var(--primary);
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .profile-item {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+        }
+
+        .profile-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #34d399;
+        }
+
+        .schemes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .scheme-item {
+            background-color: var(--bg-surface-elevated);
+            border-left: 3px solid var(--primary);
+            border-radius: 0.5rem;
+            padding: 0.85rem;
+        }
+
+        .scheme-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        .scheme-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 0.25rem 0;
+        }
+
+        .scheme-benefits {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .btn-reset {
+            background-color: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <span class="brand-badge">V2 ENGINE</span>
+        <h1>YOJNA SETU — Government Scheme Eligibility Assistant</h1>
+    </div>
+    <div class="header-meta">
+        <div><span class="status-dot"></span> <strong>Deterministic Engine:</strong> Online</div>
+        <div><strong>Groq NLP:</strong> Multi-Lingual Boundary Active</div>
+        <div><strong>Database:</strong> Supabase 1NF Normalized</div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Chat Section -->
+    <div class="chat-card">
+        <div class="chat-header">
+            <div class="chat-header-user">
+                <div class="avatar">YS</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.95rem;">Yojna Setu Assistant (Demo Mode)</div>
+                    <div style="font-size: 0.75rem; color: #34d399;">WhatsApp Emulated Channel Active</div>
+                </div>
+            </div>
+            <button class="btn-reset" onclick="resetChat()">Reset Session</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message-bubble bubble-bot">
+                🙏 <strong>नमस्ते! Welcome to Yojna Setu V2.</strong>
+                <br><br>
+                Please choose your preferred language / अपनी पसंदीदा भाषा चुनें:
+                <br>1️⃣ <strong>हिंदी (Hindi)</strong>
+                <br>2️⃣ <strong>English</strong>
+                <br>3️⃣ <strong>Hinglish</strong>
+                <div class="bubble-meta">System • Just now</div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="userInput" class="chat-input" placeholder="Type your response or query (e.g., 1, or demographic text)..." onkeydown="handleKey(event)">
+            <button class="btn-send" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Inspector Section -->
+    <div class="inspector-panel">
+        <!-- Quick Test Scenarios -->
+        <div class="card">
+            <div class="card-title">
+                <span>⚡ Portfolio Quick-Fill Scenarios</span>
+                <span style="font-size: 0.75rem; color: var(--accent-blue);">1-Click Testing</span>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                Click any prompt below to inject real multi-lingual profiles into the AI Demographics Extractor:
+            </p>
+            <div class="quick-actions">
+                <button class="btn-pill" onclick="sendPreset('1')">Language: Hindi (1)</button>
+                <button class="btn-pill" onclick="sendPreset('2')">Language: English (2)</button>
+                <button class="btn-pill" onclick="sendPreset('I am a 28 year old female farmer from Uttar Pradesh earning 1.5 lakh annually')">🌾 UP Female Farmer (₹1.5L)</button>
+                <button class="btn-pill" onclick="sendPreset('I am 21 years old male student from Maharashtra looking for scholarship')">🎓 Maharashtra Student</button>
+                <button class="btn-pill" onclick="sendPreset('Main 65 saal ka senior citizen hu Bihar se, income 80000 hai')">👴 Bihar Senior Citizen (Hinglish)</button>
+                <button class="btn-pill" onclick="sendPreset('YES')">Confirm Profile (YES)</button>
+                <button class="btn-pill" onclick="sendPreset('1')">View Next Page (1)</button>
+            </div>
+        </div>
+
+        <!-- State Machine & Profile Inspector -->
+        <div class="card">
+            <div class="card-title">
+                <span>🧠 Conversation State Machine</span>
+                <span class="state-badge" id="stateBadge">INIT</span>
+            </div>
+            <div class="profile-grid">
+                <div class="profile-item">
+                    <div class="profile-label">Age</div>
+                    <div class="profile-val" id="profAge">—</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Gender</div>
+                    <div class="profile-val" id="profGender">—</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Caste / Category</div>
+                    <div class="profile-val" id="profCaste">—</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">State</div>
+                    <div class="profile-val" id="profState">—</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Annual Income</div>
+                    <div class="profile-val" id="profIncome">—</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Occupation</div>
+                    <div class="profile-val" id="profOcc">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deterministic Eligibility Matches -->
+        <div class="card">
+            <div class="card-title">
+                <span>🎯 Deterministic Eligibility Matches</span>
+                <span id="matchCounter" style="color: var(--primary); font-family: 'JetBrains Mono', monospace; font-weight: 700;">0 Schemes Qualified</span>
+            </div>
+            <div class="schemes-list" id="schemesList">
+                <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                    Complete profile collection to view real-time deterministic eligibility matching.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const DEMO_PHONE = "+919876543210";
+
+    function appendMessage(text, isUser) {
+        const messagesDiv = document.getElementById('chatMessages');
+        const bubble = document.createElement('div');
+        bubble.className = `message-bubble ${isUser ? 'bubble-user' : 'bubble-bot'}`;
+        bubble.innerHTML = text.replace(/\n/g, '<br>');
+
+        const meta = document.createElement('div');
+        meta.className = 'bubble-meta';
+        meta.textContent = (isUser ? 'You' : 'Assistant') + ' • ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        bubble.appendChild(meta);
+
+        messagesDiv.appendChild(bubble);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendMessage(text, true);
+        input.value = '';
+
+        try {
+            const res = await fetch('/api/v1/demo/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: DEMO_PHONE, message: text })
+            });
+
+            const data = await res.json();
+            if (data.success && data.data) {
+                appendMessage(data.data.replyText, false);
+                updateInspector(data.data);
+            } else {
+                appendMessage("❌ Error: " + (data.message || "Failed to process message"), false);
+            }
+        } catch (err) {
+            console.error(err);
+            appendMessage("⚠️ Network error while connecting to Yojna Setu V2 backend.", false);
+        }
+    }
+
+    function sendPreset(text) {
+        document.getElementById('userInput').value = text;
+        sendMessage();
+    }
+
+    function handleKey(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    async function resetChat() {
+        try {
+            await fetch('/api/v1/demo/reset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: DEMO_PHONE })
+            });
+
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="message-bubble bubble-bot">
+                    🔄 <strong>Session has been reset.</strong>
+                    <br><br>
+                    Please choose your preferred language / अपनी पसंदीदा भाषा चुनें:
+                    <br>1️⃣ <strong>हिंदी (Hindi)</strong>
+                    <br>2️⃣ <strong>English</strong>
+                    <br>3️⃣ <strong>Hinglish</strong>
+                    <div class="bubble-meta">System • Just now</div>
+                </div>
+            `;
+            document.getElementById('stateBadge').textContent = 'INIT';
+            document.getElementById('profAge').textContent = '—';
+            document.getElementById('profGender').textContent = '—';
+            document.getElementById('profCaste').textContent = '—';
+            document.getElementById('profState').textContent = '—';
+            document.getElementById('profIncome').textContent = '—';
+            document.getElementById('profOcc').textContent = '—';
+            document.getElementById('matchCounter').textContent = '0 Schemes Qualified';
+            document.getElementById('schemesList').innerHTML = `
+                <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                    Complete profile collection to view real-time deterministic eligibility matching.
+                </div>
+            `;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function updateInspector(data) {
+        if (data.currentState) {
+            document.getElementById('stateBadge').textContent = data.currentState;
+        }
+
+        if (data.profile) {
+            const p = data.profile;
+            document.getElementById('profAge').textContent = p.age ?? '—';
+            document.getElementById('profGender').textContent = p.gender ?? '—';
+            document.getElementById('profCaste').textContent = p.caste ?? '—';
+            document.getElementById('profState').textContent = p.state ?? '—';
+            document.getElementById('profIncome').textContent = p.annualIncome ? '₹' + Number(p.annualIncome).toLocaleString('en-IN') : '—';
+            document.getElementById('profOcc').textContent = p.occupation ?? '—';
+        }
+
+        if (data.eligibleSchemesCount !== undefined) {
+            document.getElementById('matchCounter').textContent = `${data.eligibleSchemesCount} Schemes Qualified`;
+        }
+
+        const schemesList = document.getElementById('schemesList');
+        if (data.eligibleSchemesPreview && data.eligibleSchemesPreview.length > 0) {
+            schemesList.innerHTML = data.eligibleSchemesPreview.map(s => `
+                <div class="scheme-item">
+                    <div class="scheme-code">${s.code} • ${s.ministry}</div>
+                    <div class="scheme-name">${s.name}</div>
+                    <div class="scheme-benefits">${s.benefits.substring(0, 140)}...</div>
+                </div>
+            `).join('');
+        }
+    }
+</script>
+
+</body>
+</html>

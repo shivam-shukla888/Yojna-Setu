@@ -3,73 +3,107 @@ package com.yojnasetu.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "yojna_setu")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @NotNull
-    @Column(name = "phone_number", unique = true, nullable = false)
-    private String phoneNumber;
+    @Column(name = "phone_number_e164", nullable = false, length = 20)
+    private String phoneNumberE164;
+
+    @NotNull
+    @Column(name = "phone_number_hash", unique = true, nullable = false, length = 64)
+    private String phoneNumberHash;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "language_pref", columnDefinition = "VARCHAR(255) DEFAULT 'hi'")
-    private String languagePref = "hi";
+    @Column(name = "preferred_language", length = 10)
+    private String preferredLanguage = "en";
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
-        if (languagePref == null) {
-            languagePref = "hi";
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now();
+        }
+        if (preferredLanguage == null) {
+            preferredLanguage = "en";
         }
     }
 
-    // Default constructor
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
     public User() {
     }
 
-    // Constructor with fields
-    public User(String phoneNumber, String name) {
-        this.phoneNumber = phoneNumber;
-        this.name = name;
-        this.languagePref = "hi";
+    public User(String phoneNumberE164, String phoneNumberHash, String preferredLanguage) {
+        this.phoneNumberE164 = phoneNumberE164;
+        this.phoneNumberHash = phoneNumberHash;
+        this.preferredLanguage = preferredLanguage != null ? preferredLanguage : "en";
+        this.isActive = true;
     }
 
-    // Full constructor
-    public User(Long id, String phoneNumber, String name, String languagePref, LocalDateTime createdAt) {
-        this.id = id;
-        this.phoneNumber = phoneNumber;
-        this.name = name;
-        this.languagePref = languagePref;
-        this.createdAt = createdAt;
+    // Backward-compatible constructor
+    public User(String phoneNumberE164, String name) {
+        this.phoneNumberE164 = phoneNumberE164;
+        this.preferredLanguage = "hi";
+        this.isActive = true;
     }
 
     // Getters and Setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
+    public String getPhoneNumberE164() {
+        return phoneNumberE164;
+    }
+
+    public void setPhoneNumberE164(String phoneNumberE164) {
+        this.phoneNumberE164 = phoneNumberE164;
+    }
+
+    // Backward compatibility helper
     public String getPhoneNumber() {
-        return phoneNumber;
+        return phoneNumberE164;
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        this.phoneNumberE164 = phoneNumber;
+    }
+
+    public String getPhoneNumberHash() {
+        return phoneNumberHash;
+    }
+
+    public void setPhoneNumberHash(String phoneNumberHash) {
+        this.phoneNumberHash = phoneNumberHash;
     }
 
     public String getName() {
@@ -80,12 +114,29 @@ public class User {
         this.name = name;
     }
 
+    public String getPreferredLanguage() {
+        return preferredLanguage;
+    }
+
+    public void setPreferredLanguage(String preferredLanguage) {
+        this.preferredLanguage = preferredLanguage;
+    }
+
+    // Backward compatibility helper
     public String getLanguagePref() {
-        return languagePref;
+        return preferredLanguage;
     }
 
     public void setLanguagePref(String languagePref) {
-        this.languagePref = languagePref;
+        this.preferredLanguage = languagePref;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -94,5 +145,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
