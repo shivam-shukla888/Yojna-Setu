@@ -1,2 +1,6 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Database schema migrations and data seed files (exclude from language statistics)
+src/main/resources/db/migration/** linguist-generated=true -linguist-detectable
+src/main/resources/data.sql linguist-generated=true -linguist-detectable
